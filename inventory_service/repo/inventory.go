@@ -15,6 +15,7 @@ type InventoryRepo struct {
 
 type IInventoryRepo interface {
 	UpdateInventoryQty(productID int64, qty int64) error
+	UpdateInventoryQtyRaceCondition(productID int64, qty int64) error
 }
 
 // UpdateInventoryQty will check the available quantity before reduce to current inventory row
@@ -30,9 +31,14 @@ func (r *InventoryRepo) UpdateInventoryQty(productID int64, qty int64) error {
 	}
 
 	tx := r.db.Begin()
-	tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+	err = tx.Clauses(clause.Locking{Strength: "UPDATE"}).
 		Where("product_id = ?", productID).
-		Find(&inv)
+		Find(&inv).
+		Error
+
+	if err != nil {
+		return err
+	}
 
 	if inv.Quantity >= qty {
 		err = tx.Model(&inv).Where("product_id = ? ", productID).UpdateColumn("quantity", gorm.Expr("quantity - ?", qty)).Error
@@ -41,6 +47,31 @@ func (r *InventoryRepo) UpdateInventoryQty(productID int64, qty int64) error {
 	}
 
 	tx.Commit()
+
+	return err
+}
+
+// UpdateInventoryQtyRaceCondition will check the available quantity before reduce to current inventory row
+// but it doesnt have row lock this function will result on negative inventory number because
+// inventory qty check will overlap with other user
+func (r *InventoryRepo) UpdateInventoryQtyRaceCondition(productID int64, qty int64) error {
+	var inv entity.Inventory
+	var err error
+
+	if qty < 0 {
+		return errors.InvalidArgument("positive number is required")
+	}
+
+	err = r.db.Where("product_id = ?", productID).Find(&inv).Error
+	if err != nil {
+		return err
+	}
+
+	if inv.Quantity >= qty {
+		err = r.db.Model(&inv).Where("product_id = ? ", productID).UpdateColumn("quantity", gorm.Expr("quantity - ?", qty)).Error
+	} else {
+		err = errors.InvalidArgument("can't buy product, available quantity is " + strconv.FormatInt(inv.Quantity, 10))
+	}
 
 	return err
 }
