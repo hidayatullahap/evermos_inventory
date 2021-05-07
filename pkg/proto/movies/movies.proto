@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package movies;
+
+service Movies {
+  rpc SearchMovie (SearchRequest) returns (SearchResponse);
+  rpc DetailMovie (DetailRequest) returns (DetailResponse);
+  rpc Watchlist(WatchlistRequest) returns (NoResponse);
+  rpc GetWatchlist(GetWatchlistRequest) returns (WatchlistResponse);
+}
+
+message NoResponse {
+}
+
+message GetWatchlistRequest {
+  string user_id = 1;
+}
+
+
+message WatchlistRequest {
+  string imdb_id = 1;
+  bool fav = 2;
+  string user_id = 3;
+}
+
+message SearchRequest {
+  string query = 1;
+  int64 page = 2;
+}
+
+message DetailRequest {
+  string imdb_id = 1;
+}
+
+message SearchResponse{
+  repeated Movie movies = 1;
+  int64 total_result = 2;
+  int64 page = 3;
+  int64 result = 4;
+}
+
+message Movie{
+  string title = 1;
+  string year = 2;
+  string imdb_id = 3;
+  string type = 4;
+  string poster = 5;
+}
+
+message DetailResponse {
+  string year = 1;
+  string rated = 2;
+  string released = 3;
+  string runtime = 4;
+  string genre = 5;
+  string director = 6;
+  string writer = 7;
+  string actors = 8;
+  string plot = 9;
+  string language = 10;
+  string country = 11;
+  string awards = 12;
+  string poster = 13;
+  repeated Rating ratings = 14;
+  string metascore = 15;
+  string imdb_rating = 16;
+  string imdb_votes = 17;
+  string imdb_id = 18;
+  string type = 19;
+  string DVD = 20;
+  string BoxOffice = 21;
+  string Production = 22;
+  string Website = 23;
+  string Response = 24;
+  string Title = 25;
+}
+
+message Rating {
+  string Source = 1;
+  string Value = 2;
+}
+
+message WatchlistResponse {
+  repeated WatchlistMovie movies = 1;
+}
+
+message WatchlistMovie {
+  string id = 1;
+  string user_id = 2;
+  string imdb_id = 3;
+  string movie_title = 4;
+}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package users;
+
+service Users {
+  rpc Hello (HelloRequest) returns (HelloResponse);
+
+  rpc CreateUser (User) returns (NoResponse);
+  rpc FindUser (UserRequest) returns (User);
+}
+
+message HelloRequest {
+  string msg = 1;
+}
+
+message HelloResponse {
+  string msg = 1;
+}
+
+message UserRequest {
+  string username = 1;
+  string user_id = 2;
+}
+
+message NoResponse {
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string full_name = 3;
+  string password = 4;
+}
