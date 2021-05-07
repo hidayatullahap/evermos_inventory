@@ -11,8 +11,8 @@ quantity usually occurred because of race condition.
 2. Based on your analysis, propose a solution that will prevent the incidents from occurring again.
 
 ```text
-Race condition can prevented with lock on row of table. We will lock inv qty so when someone access the row it will wait for
-update/process to happened first. If update lock release it will have accurate inventory quantity
+Race condition can prevented with lock on row of table. We will lock the inventory row qty so when someone tried to access it will wait for
+update/process on that row to happened first. If lock got released, the next request will have an accurate inventory quantity.
 ```
 
 3. Based on your proposed solution, build a Proof of Concept that demonstrates technically how your solution will work
