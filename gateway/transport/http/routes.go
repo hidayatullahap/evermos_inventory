@@ -10,4 +10,5 @@ func setupRoutes(e *echo.Echo, app *entity.App) {
 
 	v1 := e.Group("/api/v1")
 	v1.POST("/orders", h.Order)
+	v1.GET("/inventories/:productID", h.GetInventory)
 }

@@ -13,6 +13,21 @@ type Handler struct {
 	inventoryAction action.IInventoryAction
 }
 
+func (h *Handler) GetInventory(ctx context.Context, request *inventory.GetInventoryRequest) (*inventory.GetInventoryResponse, error) {
+	inv, err := h.inventoryAction.GetInventory(request.ProductId)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &inventory.GetInventoryResponse{
+		Id:        inv.ID,
+		ProductId: inv.ProductID,
+		Qty:       inv.Quantity,
+	}
+
+	return res, err
+}
+
 func (h *Handler) UpdateInventoryQty(ctx context.Context, request *inventory.UpdateQtyRequest) (*inventory.NoResponse, error) {
 	_, err := h.inventoryAction.UpdateInventoryQty(request.ProductId, request.Qty)
 

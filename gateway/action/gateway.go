@@ -9,6 +9,7 @@ import (
 
 type IGatewayAction interface {
 	Order(ctx context.Context, request entity.Inventory) error
+	GetInventory(ctx context.Context, request entity.Inventory) (entity.Inventory, error)
 }
 
 type GatewayAction struct {

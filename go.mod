@@ -17,7 +17,7 @@ require (
 	go.elastic.co/apm/module/apmechov4 v1.11.0
 	go.elastic.co/apm/module/apmgrpc v1.11.0
 	go.elastic.co/apm/module/apmhttp v1.11.0
-	go.mongodb.org/mongo-driver v1.5.2 // indirect
+	go.mongodb.org/mongo-driver v1.5.2
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	google.golang.org/genproto v0.0.0-20200806141610-86f49bd18e98
 	google.golang.org/grpc v1.37.0
