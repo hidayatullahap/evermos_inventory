@@ -111,3 +111,48 @@ func TestInventoryRepo_UpdateInventoryQty(t *testing.T) {
 	log.Printf("test finished, qty of row id %v = %v", id, inv.Quantity)
 	assert.Equal(t, int64(0), inv.Quantity, "Qty should 0")
 }
+
+// TestInventoryRepo_UpdateInventoryQty will test race condition on reduce inventory qty
+// test will spawn 50 go routine to simulate 50 person buy at same product simultaneously
+// product id will only available with 5 qty
+// the expected result is product qty will be negative value
+//
+// cmd to run:
+// go test ./inventory_service/repo -tags integration -count 1 -v -run=^TestInventoryRepo_UpdateInventoryQtyRaceCondition
+func TestInventoryRepo_UpdateInventoryQtyRaceCondition(t *testing.T) {
+	repo := InitInventoryRepo()
+	id := setupInventoryRow(repo)
+
+	log.Printf("testing product id: %v", id)
+	log.Printf("fetching inventory row of id %v ...", id)
+	inv, err := repo.FindProductInventory(id)
+	if err != nil {
+		testFailed(t, err)
+	}
+
+	log.Printf("success, qty of row id %v = %v", id, inv.Quantity)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < 50; i++ {
+		wg.Add(1)
+
+		go func(loop int) {
+			repo.UpdateInventoryQtyRaceCondition(id, 1)
+			wg.Done()
+		}(i)
+	}
+
+	wg.Wait()
+
+	inv, err = repo.FindProductInventory(id)
+	if err != nil {
+		testFailed(t, err)
+	}
+
+	log.Printf("test finished, qty of row id %v = %v", id, inv.Quantity)
+
+	if inv.Quantity > 0 {
+		t.Errorf("expected result is negative value")
+	}
+}
