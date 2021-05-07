@@ -3,14 +3,14 @@ package repo
 import (
 	"log"
 	"math/rand"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/hidayatullahap/evermos/inventory_service/entity"
 	"github.com/hidayatullahap/evermos/pkg/db/mysql"
-	"github.com/hidayatullahap/evermos/pkg/grpc/codes"
 	"github.com/joho/godotenv"
-	"google.golang.org/grpc/status"
+	"github.com/stretchr/testify/assert"
 )
 
 func testFailed(t *testing.T, err error) {
@@ -82,16 +82,32 @@ func TestInventoryRepo_UpdateInventoryQty(t *testing.T) {
 	id := setupInventoryRow(repo)
 
 	log.Printf("testing product id: %v", id)
-
-	err := repo.UpdateInventoryQty(1, 10)
+	log.Printf("fetching inventory row of id %v ...", id)
+	inv, err := repo.FindProductInventory(id)
 	if err != nil {
-		if st, ok := status.FromError(err); ok {
-			if st.Code() != codes.InvalidArgument {
-				testFailed(t, err)
-			}
-		} else {
-			testFailed(t, err)
-		}
+		testFailed(t, err)
 	}
 
+	log.Printf("success, qty of row id %v = %v", id, inv.Quantity)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < 50; i++ {
+		wg.Add(1)
+
+		go func(loop int) {
+			repo.UpdateInventoryQty(id, 1)
+			wg.Done()
+		}(i)
+	}
+
+	wg.Wait()
+
+	inv, err = repo.FindProductInventory(id)
+	if err != nil {
+		testFailed(t, err)
+	}
+
+	log.Printf("test finished, qty of row id %v = %v", id, inv.Quantity)
+	assert.Equal(t, int64(0), inv.Quantity, "Qty should 0")
 }

@@ -11,6 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/oklog/ulid/v2 v2.0.2
+	github.com/stretchr/testify v1.6.1
 	go.elastic.co/apm v1.11.0
 	go.elastic.co/apm/module/apmgrpc v1.11.0
 	go.elastic.co/apm/module/apmhttp v1.11.0
