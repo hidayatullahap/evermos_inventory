@@ -17,9 +17,17 @@ type IInventoryRepo interface {
 	UpdateInventoryQty(productID int64, qty int64) error
 }
 
+// UpdateInventoryQty will check the available quantity before reduce to current inventory row
+// to prevent race condition select will locked until update is executed
+// update only occur when qty is available
+// transaction will always committed to prevent deadlock
 func (r *InventoryRepo) UpdateInventoryQty(productID int64, qty int64) error {
 	var inv entity.Inventory
 	var err error
+
+	if qty < 0 {
+		return errors.InvalidArgument("positive number is required")
+	}
 
 	tx := r.db.Begin()
 	tx.Clauses(clause.Locking{Strength: "UPDATE"}).
