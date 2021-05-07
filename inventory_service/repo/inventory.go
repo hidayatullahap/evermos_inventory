@@ -16,6 +16,9 @@ type InventoryRepo struct {
 type IInventoryRepo interface {
 	UpdateInventoryQty(productID int64, qty int64) error
 	UpdateInventoryQtyRaceCondition(productID int64, qty int64) error
+	UpdateProductQty(productID int64, qty int64) error
+	FindProductInventory(productID int64) (entity.Inventory, error)
+	CreateProductInventory(inventory entity.Inventory) error
 }
 
 // UpdateInventoryQty will check the available quantity before reduce to current inventory row
@@ -73,6 +76,22 @@ func (r *InventoryRepo) UpdateInventoryQtyRaceCondition(productID int64, qty int
 		err = errors.InvalidArgument("can't buy product, available quantity is " + strconv.FormatInt(inv.Quantity, 10))
 	}
 
+	return err
+}
+
+// UpdateProductQty this function is to update exact qty
+func (r *InventoryRepo) UpdateProductQty(productID int64, qty int64) error {
+	err := r.db.Model(&entity.Inventory{}).Where("product_id = ? ", productID).UpdateColumn("quantity", qty).Error
+	return err
+}
+
+func (r *InventoryRepo) FindProductInventory(productID int64) (i entity.Inventory, err error) {
+	err = r.db.Where("product_id = ?", productID).Find(&i).Error
+	return
+}
+
+func (r *InventoryRepo) CreateProductInventory(inventory entity.Inventory) error {
+	err := r.db.Create(&inventory).Error
 	return err
 }
 
