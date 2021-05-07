@@ -10,16 +10,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Inventory struct {
-	ID        int64 `gorm:"id"`
-	ProductID int64 `gorm:"product_id"`
-	Qty       int64 `gorm:"qty"`
-}
-
-func (t Inventory) TableName() string {
-	return "inventories"
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {

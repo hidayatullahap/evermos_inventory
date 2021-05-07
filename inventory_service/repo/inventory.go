@@ -39,6 +39,10 @@ func (r *InventoryRepo) UpdateInventoryQty(productID int64, qty int64) error {
 		Find(&inv).
 		Error
 
+	if inv.ProductID == 0 {
+		return errors.NotFound("product not found")
+	}
+
 	if err != nil {
 		return err
 	}
@@ -87,6 +91,11 @@ func (r *InventoryRepo) UpdateProductQty(productID int64, qty int64) error {
 
 func (r *InventoryRepo) FindProductInventory(productID int64) (i entity.Inventory, err error) {
 	err = r.db.Where("product_id = ?", productID).Find(&i).Error
+
+	if productID == 0 {
+		err = errors.NotFound("product not found")
+	}
+
 	return
 }
 
