@@ -1,6 +1,6 @@
 module github.com/hidayatullahap/evermos
 
-go 1.15
+go 1.13
 
 require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect

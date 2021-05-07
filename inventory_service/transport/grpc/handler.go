@@ -14,7 +14,7 @@ type Handler struct {
 }
 
 func (h *Handler) UpdateInventoryQty(ctx context.Context, request *inventory.UpdateQtyRequest) (*inventory.NoResponse, error) {
-	err := h.inventoryAction.UpdateInventoryQty(request.ProductId, request.Qty)
+	_, err := h.inventoryAction.UpdateInventoryQty(request.ProductId, request.Qty)
 
 	return &inventory.NoResponse{}, err
 }

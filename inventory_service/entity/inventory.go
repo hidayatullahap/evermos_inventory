@@ -1,7 +1,11 @@
 package entity
 
 type Inventory struct {
-	ID        string `json:"id" gorm:"id"`
-	ProductID string `json:"product_id" gorm:"product_id"`
-	Quantity  string `json:"quantity" gorm:"quantity"`
+	ID        int64 `json:"id" gorm:"id"`
+	ProductID int64 `json:"product_id" gorm:"product_id"`
+	Quantity  int64 `json:"quantity" gorm:"quantity"`
+}
+
+func (t Inventory) TableName() string {
+	return "inventories"
 }

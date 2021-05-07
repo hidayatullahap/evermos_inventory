@@ -6,20 +6,22 @@ import (
 )
 
 type IInventoryAction interface {
-	UpdateInventoryQty(productID int64, qty int64) error
+	UpdateInventoryQty(productID int64, qty int64) (int64, error)
 }
 
 type InventoryAction struct {
-	userRepo repo.IInventoryRepo
+	inventoryRepo repo.IInventoryRepo
 }
 
-func (r *InventoryAction) UpdateInventoryQty(productID int64, qty int64) error {
+func (r *InventoryAction) UpdateInventoryQty(productID int64, qty int64) (int64, error) {
+	var availableQty int64
+	err := r.inventoryRepo.UpdateInventoryQty(productID, qty)
 
-	return nil
+	return availableQty, err
 }
 
 func NewInventoryAction(app *entity.App) IInventoryAction {
 	return &InventoryAction{
-		userRepo: repo.NewInventoryRepo(app),
+		inventoryRepo: repo.NewInventoryRepo(app),
 	}
 }
